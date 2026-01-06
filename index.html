@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATG 戰神賽特｜選房工具</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI";
+      padding: 16px;
+      background: #f9f9f9;
+    }
+    h2 { text-align: center; }
+    textarea, button {
+      width: 100%;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px;
+      background: #007aff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th { background: #f0f0f0; }
+    .yes { background: #d4edda; }
+    .no { background: #f8d7da; }
+  </style>
+</head>
+<body>
+
+<h2>ATG 戰神賽特｜選房判斷（網頁版）</h2>
+
+<p>請貼上房間資料（CSV 格式）：</p>
+
+<textarea id="input" rows="8">
+room_id,result,date
+1,lose,2026-01-07
+1,win,2026-01-07
+1,lose,2026-01-07
+2,lose,2026-01-07
+2,win,2026-01-07
+3,lose,2026-01-07
+3,lose,2026-01-07
+</textarea>
+
+<button onclick="analyze()">分析房間</button>
+
+<div id="output"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
