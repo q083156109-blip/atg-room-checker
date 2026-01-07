@@ -1,82 +1,49 @@
-function analyze() {
+function analyze(){
   const text = document.getElementById("input").value.trim();
-  if (!text) {
-    alert("請先貼上資料");
-    return;
-  }
+  if(!text){ alert("請貼上資料"); return; }
 
   const lines = text.split("\n");
-  const header = lines.shift(); // 移除表頭
+  lines.shift(); // 移除表頭
 
-  const data = {};
-  let today = null;
+  const grid = document.getElementById("grid");
+  const detail = document.getElementById("detail");
+  grid.innerHTML = "";
+  detail.innerHTML = "點擊機台查看詳細";
 
-  lines.forEach(line => {
-    const parts = line.split(",");
-    if (parts.length < 3) return;
-
-    const room = parts[0].trim();
-    const result = parts[1].trim();
-    const date = parts[2].trim();
-
-    if (!today) today = date;
-
-    if (!data[room]) data[room] = [];
-    data[room].push({ result, date });
+  const machines = lines.map(l=>{
+    const [id,today,d30,p1,p2] = l.split(",");
+    return {
+      id:id.trim(),
+      today:parseFloat(today),
+      d30:parseFloat(d30),
+      pre1:parseInt(p1),
+      pre2:parseInt(p2)
+    };
   });
 
-  let html = `
-    <table>
-      <tr>
-        <th>房間</th>
-        <th>前2把%</th>
-        <th>今日%</th>
-        <th>近30%</th>
-        <th>連敗</th>
-        <th>建議</th>
-      </tr>
-  `;
+  machines.forEach(m=>{
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerHTML=`<div>${m.id}</div><div class="rate">${m.today}%</div>`;
+    div.onclick=()=>show(m);
+    grid.appendChild(div);
+  });
 
-  for (const room in data) {
-    const records = data[room];
-
-    const last2 = records.slice(-2);
-    const last30 = records.slice(-30);
-    const todayRec = records.filter(r => r.date === today);
-
-    const winRate = arr => {
-      if (arr.length === 0) return 0;
-      return arr.filter(r => r.result === "win").length / arr.length * 100;
-    };
-
-    let loseStreak = 0;
-    for (let i = records.length - 1; i >= 0; i--) {
-      if (records[i].result === "lose") loseStreak++;
-      else break;
+  function show(m){
+    let level="不建議", cls="bad";
+    if(m.today>=115 && m.d30>=95 && m.pre1>=150 && m.pre2>=80){
+      level="可進"; cls="ok";
+    }else if(m.today>=105 && m.d30>=90){
+      level="觀望"; cls="wait";
     }
 
-    const rateLast2 = winRate(last2);
-    const rateToday = winRate(todayRec);
-    const rate30 = winRate(last30);
-
-    const isYes =
-      rateToday >= 30 &&
-      rate30 >= 35 &&
-      loseStreak <= 3 &&
-      rateLast2 >= 50;
-
-    html += `
-      <tr class="${isYes ? "yes" : "no"}">
-        <td>${room}</td>
-        <td>${rateLast2.toFixed(1)}%</td>
-        <td>${rateToday.toFixed(1)}%</td>
-        <td>${rate30.toFixed(1)}%</td>
-        <td>${loseStreak}</td>
-        <td>${isYes ? "YES" : "NO"}</td>
-      </tr>
+    detail.innerHTML=`
+      <b>機台 ${m.id}</b><br>
+      今日：${m.today}%<br>
+      近30天：${m.d30}%<br>
+      前一：${m.pre1}<br>
+      前二：${m.pre2}<br><br>
+      <b class="${cls}">建議：${level}</b>
     `;
   }
-
-  html += "</table>";
-  document.getElementById("output").innerHTML = html;
 }
