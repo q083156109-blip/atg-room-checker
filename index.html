@@ -1,34 +1,109 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ATG 機台選擇工具</title>
+<title>AI 分析系統</title>
+
 <style>
-body { font-family:-apple-system; background:#111; color:#fff; padding:12px; }
-textarea,button { width:100%; font-size:16px; margin-top:8px; }
-button { padding:10px; background:#7c5cff; border:none; color:#fff; border-radius:6px; }
-.grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:12px; }
-.card { background:#2a2a2a; padding:10px; border-radius:8px; text-align:center; }
-.rate { color:#ffd86b; font-weight:bold; }
-.detail { margin-top:12px; background:#1f1f1f; padding:12px; border-radius:8px; }
-.ok{color:#4caf50} .wait{color:#ff9800} .bad{color:#f44336}
+body{
+  margin:0;
+  font-family:-apple-system, BlinkMacSystemFont;
+  background:#050b0f;
+  color:#e6fff6;
+}
+.container{
+  max-width:420px;
+  margin:auto;
+  padding:20px;
+}
+.title{
+  text-align:center;
+  font-size:22px;
+  color:#3cffc3;
+  margin-bottom:20px;
+}
+.label{
+  margin-top:14px;
+  font-size:14px;
+  color:#ff4fd8;
+}
+select,input{
+  width:100%;
+  margin-top:6px;
+  padding:12px;
+  background:#0b1c18;
+  border:1px solid #2fffd2;
+  color:#e6fff6;
+  border-radius:8px;
+  font-size:16px;
+}
+.row{
+  display:flex;
+  gap:10px;
+}
+button{
+  margin-top:24px;
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  background:#2fffd2;
+  color:#002b1f;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+}
+.result{
+  margin-top:20px;
+  padding:16px;
+  border-radius:10px;
+  text-align:center;
+  font-size:18px;
+}
+.ok{ background:#123f2f; color:#3cffc3; }
+.wait{ background:#3a2f12; color:#ffd36a; }
+.bad{ background:#3a1212; color:#ff6b6b; }
 </style>
 </head>
+
 <body>
+<div class="container">
 
-<h3>ATG 戰神賽特｜選房工具</h3>
+  <div class="title">⚙️ RK 星河娛樂分析</div>
 
-<textarea id="input" rows="6">
-機台,今日,近30,前一,前二
-007,118.12,94.76,210,139
-046,122.77,96.43,165,57
-</textarea>
+  <div class="label">裝置</div>
+  <select id="device">
+    <option>iOS</option>
+    <option>Android</option>
+  </select>
 
-<button onclick="analyze()">分析</button>
+  <div class="label">平台選擇</div>
+  <select id="platform">
+    <option>RK星河娛樂城</option>
+  </select>
 
-<div id="grid" class="grid"></div>
-<div id="detail" class="detail">點擊機台查看詳細</div>
+  <div class="label">得分率</div>
+  <div class="row">
+    <input id="today" placeholder="今日得分率 %">
+    <input id="d30" placeholder="30日得分率 %">
+  </div>
+
+  <div class="label">遊戲選項</div>
+  <select>
+    <option>戰神賽特</option>
+  </select>
+
+  <div class="label">未開轉數</div>
+  <input id="spin" placeholder="輸入未開轉數">
+
+  <div class="label">輸入桌號</div>
+  <input id="table" placeholder="輸入桌號">
+
+  <button onclick="analyze()">開始分析</button>
+
+  <div id="result"></div>
+
+</div>
 
 <script src="script.js"></script>
 </body>
