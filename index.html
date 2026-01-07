@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI 分析系統</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATG 戰神賽特｜分析師系統</title>
 
 <style>
 body{
   margin:0;
-  font-family:-apple-system, BlinkMacSystemFont;
   background:#050b0f;
-  color:#e6fff6;
+  font-family:-apple-system,BlinkMacSystemFont;
+  color:#eafff6;
 }
 .container{
   max-width:420px;
@@ -28,13 +28,13 @@ body{
   font-size:14px;
   color:#ff4fd8;
 }
-select,input{
+input,select{
   width:100%;
-  margin-top:6px;
   padding:12px;
+  margin-top:6px;
   background:#0b1c18;
   border:1px solid #2fffd2;
-  color:#e6fff6;
+  color:#eafff6;
   border-radius:8px;
   font-size:16px;
 }
@@ -43,8 +43,8 @@ select,input{
   gap:10px;
 }
 button{
-  margin-top:24px;
   width:100%;
+  margin-top:22px;
   padding:14px;
   font-size:18px;
   background:#2fffd2;
@@ -58,46 +58,41 @@ button{
   padding:16px;
   border-radius:10px;
   text-align:center;
-  font-size:18px;
+  font-size:17px;
 }
-.ok{ background:#123f2f; color:#3cffc3; }
-.wait{ background:#3a2f12; color:#ffd36a; }
-.bad{ background:#3a1212; color:#ff6b6b; }
+.ok{background:#123f2f;color:#3cffc3;}
+.wait{background:#3a2f12;color:#ffd36a;}
+.bad{background:#3a1212;color:#ff6b6b;}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-  <div class="title">⚙️ RK 星河娛樂分析</div>
+  <div class="title">🎰 ATG 戰神賽特｜分析師系統</div>
 
   <div class="label">裝置</div>
-  <select id="device">
+  <select>
     <option>iOS</option>
     <option>Android</option>
   </select>
 
-  <div class="label">平台選擇</div>
-  <select id="platform">
-    <option>RK星河娛樂城</option>
+  <div class="label">平台</div>
+  <select>
+    <option>RK 星河娛樂城</option>
   </select>
 
   <div class="label">得分率</div>
   <div class="row">
-    <input id="today" placeholder="今日得分率 %">
-    <input id="d30" placeholder="30日得分率 %">
+    <input id="today" placeholder="今日得分率（例：118%）">
+    <input id="d30" placeholder="30日得分率（例：96%）">
   </div>
 
-  <div class="label">遊戲選項</div>
-  <select>
-    <option>戰神賽特</option>
-  </select>
-
   <div class="label">未開轉數</div>
-  <input id="spin" placeholder="輸入未開轉數">
+  <input id="spin" placeholder="例：150">
 
-  <div class="label">輸入桌號</div>
-  <input id="table" placeholder="輸入桌號">
+  <div class="label">桌號</div>
+  <input id="table" placeholder="例：011">
 
   <button onclick="analyze()">開始分析</button>
 
@@ -105,6 +100,41 @@ button{
 
 </div>
 
-<script src="script.js"></script>
+<script>
+function analyze(){
+  const today = parseFloat(document.getElementById("today").value.replace("%",""));
+  const d30 = parseFloat(document.getElementById("d30").value.replace("%",""));
+  const spin = parseInt(document.getElementById("spin").value);
+  const table = document.getElementById("table").value.trim();
+  const box = document.getElementById("result");
+
+  if(isNaN(today)||isNaN(d30)||isNaN(spin)||!table){
+    box.innerHTML = "<div class='result bad'>⚠️ 分析師提醒：資料不完整</div>";
+    return;
+  }
+
+  let result="❌ 不建議";
+  let cls="bad";
+
+  if(today>=115 && d30>=95 && spin>=150){
+    result="✅ 可進（符合分析師條件）";
+    cls="ok";
+  }else if(today>=105 && d30>=90){
+    result="⚠️ 觀察（需控風險）";
+    cls="wait";
+  }
+
+  box.innerHTML = `
+    <div class="result ${cls}">
+      桌號：<b>${table}</b><br><br>
+      今日得分率：${today}%<br>
+      30日得分率：${d30}%<br>
+      未開轉數：${spin}<br><br>
+      分析結果：<b>${result}</b>
+    </div>
+  `;
+}
+</script>
+
 </body>
 </html>
