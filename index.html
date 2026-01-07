@@ -13,7 +13,7 @@ body{
   color:#eafff6;
 }
 .container{
-  max-width:420px;
+  max-width:440px;
   margin:auto;
   padding:20px;
 }
@@ -28,7 +28,7 @@ body{
   font-size:14px;
   color:#ff4fd8;
 }
-input,select{
+input,select,textarea{
   width:100%;
   padding:12px;
   margin-top:6px;
@@ -54,85 +54,116 @@ button{
   font-weight:bold;
 }
 .result{
-  margin-top:20px;
-  padding:16px;
+  margin-top:14px;
+  padding:14px;
   border-radius:10px;
-  text-align:center;
-  font-size:17px;
+  font-size:15px;
 }
 .ok{background:#123f2f;color:#3cffc3;}
 .wait{background:#3a2f12;color:#ffd36a;}
 .bad{background:#3a1212;color:#ff6b6b;}
+.risk-low{opacity:1}
+.risk-mid{opacity:.9}
+.risk-high{opacity:.8}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-  <div class="title">🎰 ATG 戰神賽特｜分析師系統</div>
+<div class="title">🎰 ATG 戰神賽特｜分析師系統</div>
 
-  <div class="label">裝置</div>
-  <select>
-    <option>iOS</option>
-    <option>Android</option>
-  </select>
+<div class="label">得分率</div>
+<div class="row">
+  <input id="today" placeholder="今日得分率（118%）">
+  <input id="d30" placeholder="30日得分率（96%）">
+</div>
+<div class="row">
+  <input id="p1" placeholder="前一得分率（88%）">
+  <input id="p2" placeholder="前二得分率（82%）">
+</div>
 
-  <div class="label">平台</div>
-  <select>
-    <option>新天下娛樂城</option>
-  </select>
+<div class="label">未開轉數</div>
+<input id="spin" placeholder="例：150">
 
-  <div class="label">得分率</div>
-  <div class="row">
-    <input id="today" placeholder="今日得分率（例：118%）">
-    <input id="d30" placeholder="30日得分率（例：96%）">
-  </div>
+<div class="label">桌號（可多桌）</div>
+<textarea id="tables" rows="3" placeholder="007,011,046 或一行一桌"></textarea>
 
-  <div class="label">未開轉數</div>
-  <input id="spin" placeholder="例：150">
+<button onclick="analyze()">開始分析</button>
 
-  <div class="label">桌號</div>
-  <input id="table" placeholder="例：011">
-
-  <button onclick="analyze()">開始分析</button>
-
-  <div id="result"></div>
+<div id="result"></div>
 
 </div>
 
 <script>
-function analyze(){
-  const today = parseFloat(document.getElementById("today").value.replace("%",""));
-  const d30 = parseFloat(document.getElementById("d30").value.replace("%",""));
-  const spin = parseInt(document.getElementById("spin").value);
-  const table = document.getElementById("table").value.trim();
-  const box = document.getElementById("result");
+function num(v){
+  return parseFloat(v.replace("%","").trim());
+}
 
-  if(isNaN(today)||isNaN(d30)||isNaN(spin)||!table){
-    box.innerHTML = "<div class='result bad'>⚠️ 分析師提醒：資料不完整</div>";
+function analyze(){
+  const today = num(document.getElementById("today").value);
+  const d30   = num(document.getElementById("d30").value);
+  const p1    = num(document.getElementById("p1").value);
+  const p2    = num(document.getElementById("p2").value);
+  const spin  = parseInt(document.getElementById("spin").value);
+  const tablesText = document.getElementById("tables").value;
+  const box = document.getElementById("result");
+  box.innerHTML = "";
+
+  if([today,d30,p1,p2,spin].some(isNaN) || !tablesText){
+    box.innerHTML="<div class='result bad'>⚠️ 分析師提醒：資料未填完整</div>";
     return;
   }
 
-  let result="❌ 不建議";
-  let cls="bad";
+  const tables = tablesText
+    .split(/[\n,]+/)
+    .map(t=>t.trim())
+    .filter(t=>t);
 
-  if(today>=115 && d30>=95 && spin>=150){
-    result="✅ 可進（符合分析師條件）";
-    cls="ok";
-  }else if(today>=105 && d30>=90){
-    result="⚠️ 觀察（需控風險）";
-    cls="wait";
-  }
+  let results = [];
 
-  box.innerHTML = `
-    <div class="result ${cls}">
-      桌號：<b>${table}</b><br><br>
-      今日得分率：${today}%<br>
-      30日得分率：${d30}%<br>
-      未開轉數：${spin}<br><br>
-      分析結果：<b>${result}</b>
-    </div>
-  `;
+  tables.forEach(table=>{
+    let score = 0;
+    let result="❌ 不建議", cls="bad";
+    let risk="🔴 高風險", riskCls="risk-high";
+
+    // 評分邏輯（分析師）
+    if(today>=115) score+=2;
+    if(d30>=95) score+=2;
+    if(spin>=150) score+=2;
+    if(p1<=95) score+=1;
+    if(p2<=95) score+=1;
+
+    if(score>=7){
+      result="✅ 可進";
+      cls="ok";
+      risk="🟢 低風險";
+      riskCls="risk-low";
+    }else if(score>=5){
+      result="⚠️ 觀察";
+      cls="wait";
+      risk="🟡 中風險";
+      riskCls="risk-mid";
+    }
+
+    results.push({
+      table, score, cls, result, risk, riskCls
+    });
+  });
+
+  // 自動排序（分數高的在上）
+  results.sort((a,b)=>b.score-a.score);
+
+  results.forEach(r=>{
+    const div=document.createElement("div");
+    div.className=`result ${r.cls} ${r.riskCls}`;
+    div.innerHTML=`
+      桌號 <b>${r.table}</b><br>
+      分析結果：<b>${r.result}</b><br>
+      風險等級：<b>${r.risk}</b>
+    `;
+    box.appendChild(div);
+  });
 }
 </script>
 
